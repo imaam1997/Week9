@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      label {
+        display: block;
+        margin-bottom: 5px;
+      }
+      input {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+      }
+      button {
+        background-color: #4caf50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background-color: #45a049;
+      }
+      .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+      }
+      .alert.success {
+        background-color: #4caf50;
+        color: white;
+      }
+      .alert.error {
+        background-color: #ad3229;
+        color: white;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Login</h1>
+    <!-- Alert Messages -->
+    <div id="alertMessage" class="alert" style="display: none"></div>
+    <!-- Login Form -->
+    <form id="loginForm" action="/user/login" method="POST">
+      <label for="email">Email:</label>
+      <input type="email" id="email" name="email" required /><br /><br />
+      <label for="password">Password:</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        required
+      /><br /><br />
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="/user/sign-up">Sign Up</a></p>
+
+    <script>
+      const loginForm = document.getElementById("loginForm");
+      const alertMessage = document.getElementById("alertMessage");
+      loginForm.addEventListener("submit", function (event) {
+        event.preventDefault();
+        const formData = new FormData(loginForm);
+        const email = formData.get("email");
+        const password = formData.get("password");
+        fetch("/user/login", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email, password }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.message) {
+              showSuccessMessage(data.message);
+              setTimeout(() => {
+                window.location.href = "/bookstore"; // Redirect to homepage after success message
+              }, 2000); // Redirect after 2 seconds
+            } else {
+              showErrorMessage(data.error);
+            }
+          })
+          .catch((error) => {
+            console.error("Error logging in:", error);
+            showErrorMessage("An error occurred. Please try again later.");
+          });
+      });
+      function showSuccessMessage(message) {
+        alertMessage.textContent = message;
+        alertMessage.className = "alert success";
+        alertMessage.style.display = "block";
+      }
+      function showErrorMessage(message) {
+        alertMessage.textContent = message;
+        alertMessage.className = "alert error";
+        alertMessage.style.display = "block";
+      }
+    </script>
+  </body>
+</html>

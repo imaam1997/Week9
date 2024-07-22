@@ -2,7 +2,8 @@ const express = require("express");
 const router = express.Router();
 const path = require("path");
 const Book = require("../models/book");
-const validateBook = require("../middleware/addbook_validator");
+const auth = require("../middleware/auth")
+const {validateBook} = require("../middleware/validator");
 router.get("/", (req, res) => {
   res.sendFile(path.join(__dirname, "../views", "books.html"));
 });
@@ -19,10 +20,10 @@ router.get("/api/books", (req, res) => {
 // add route
 router
   .route("/add")
-  .get((req, res) => {
+  .get(auth, (req, res) => {
     res.sendFile(path.join(__dirname, "../views/add.html"));
   })
-  .post(validateBook, (req, res) => {
+  .post(auth, validateBook,(req, res) => {
     let book = new Book();
     book.title = req.body.title;
     book.author = req.body.author;
